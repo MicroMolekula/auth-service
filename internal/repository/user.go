@@ -44,3 +44,11 @@ func (ur *UserRepository) FindOneByEmail(email string) (*models.User, error) {
 	}
 	return user, nil
 }
+
+func (ur *UserRepository) FindOneByYandexId(id string) (*models.User, error) {
+	var user *models.User
+	if err := ur.db.Where("yandex_id = ?", id).First(&user).Error; err != nil {
+		return nil, err
+	}
+	return user, nil
+}

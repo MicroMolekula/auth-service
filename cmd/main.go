@@ -39,6 +39,7 @@ func main() {
 	store := cookie.NewStore([]byte(cfg.SessionSecret))
 	store.Options(sessions.Options{
 		HttpOnly: true,
+		Domain:   "",
 	})
 	engine.Use(sessions.Sessions("FITSESSION", store))
 	engine.POST("/login", authController.Login)

@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/MicroMolekula/auth-service/internal/config"
 	"github.com/MicroMolekula/auth-service/internal/dto"
 	"github.com/MicroMolekula/auth-service/internal/service"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
 	"net/http"
@@ -33,6 +33,7 @@ func (oc *OauthYandexController) LoginHandler(ctx *gin.Context) {
 }
 
 func (oc *OauthYandexController) CallbackHandler(ctx *gin.Context) {
+	session := sessions.Default(ctx)
 	state := ctx.Query("state")
 	if state != oc.cfg.OauthYandex.State {
 		ErrorResponse(http.StatusBadRequest, "Invalid state", errors.New("invalid state"), ctx)
@@ -61,6 +62,12 @@ func (oc *OauthYandexController) CallbackHandler(ctx *gin.Context) {
 		ErrorResponse(http.StatusInternalServerError, "Failed to parse user info", errors.New("failed to parse user info"), ctx)
 		return
 	}
-	fmt.Printf("%+v\n", yandexUser)
+
+	tokenDto, err := oc.authService.LoginWithYandexId(&yandexUser)
+	if err != nil {
+		ErrorResponse(http.StatusInternalServerError, "Failed to get user info", errors.New("failed to get user info"), ctx)
+		return
+	}
+	session.Set("FITSESSION", tokenDto.RefreshToken)
 	ctx.Redirect(http.StatusTemporaryRedirect, "https://not-five.ru")
 }

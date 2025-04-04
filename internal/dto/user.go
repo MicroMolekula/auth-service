@@ -43,3 +43,11 @@ type YandexUser struct {
 	Name     string `json:"real_name"`
 	Gender   string `json:"sex"`
 }
+
+func YandexUserToModel(user *YandexUser) *models.User {
+	return &models.User{
+		Name:     user.Name,
+		Email:    user.Email,
+		YandexID: user.ID,
+	}
+}

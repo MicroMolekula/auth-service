@@ -79,3 +79,34 @@ func (s *AuthService) RefreshToken(refreshToken string) (string, error) {
 	}
 	return token, nil
 }
+
+func (s *AuthService) LoginWithYandexId(userYandex *dto.YandexUser) (*dto.Token, error) {
+	user, err := s.userRepository.FindOneByYandexId(userYandex.ID)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	if user != nil {
+		userDto := dto.UserModelToDto(user)
+		refreshToken, err := s.jwtService.GenerateTokenByUser(userDto, s.cfg.JWT.TTL)
+		if err != nil {
+			return nil, err
+		}
+		return &dto.Token{
+			RefreshToken: refreshToken,
+		}, nil
+	} else {
+		userModel := dto.YandexUserToModel(userYandex)
+		if err = s.userRepository.Create(userModel); err != nil {
+			return nil, err
+		}
+		// TODO исправить
+		userDto := dto.UserModelToDto(userModel)
+		refreshToken, err := s.jwtService.GenerateTokenByUser(userDto, s.cfg.JWT.RefreshTTL)
+		if err != nil {
+			return nil, err
+		}
+		return &dto.Token{
+			RefreshToken: refreshToken,
+		}, nil
+	}
+}

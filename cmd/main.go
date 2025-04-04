@@ -45,6 +45,7 @@ func main() {
 	engine.POST("/register", authController.Register)
 	engine.GET("/refresh_token", authController.RefreshToken)
 	engine.GET("/logout", authController.Logout)
+	engine.GET("/yandex/callback", oauthYandexController.CallbackHandler)
 
 	if err := engine.Run(":" + cfg.Server.Port); err != nil {
 		log.Fatal(err)

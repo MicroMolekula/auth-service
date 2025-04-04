@@ -13,11 +13,11 @@ var (
 )
 
 type DataJwt struct {
-	Id       string `json:"id"`
-	Iat      int64  `json:"iat"`
-	Exp      int64  `json:"exp"`
-	Role     string `json:"role"`
-	Username string `json:"username"`
+	Id    int    `json:"id"`
+	Iat   int64  `json:"iat"`
+	Exp   int64  `json:"exp"`
+	Role  string `json:"role"`
+	Email string `json:"username"`
 	jwt.RegisteredClaims
 }
 
@@ -31,11 +31,10 @@ func NewJwtService(cfg *config.Config) *JWTService {
 
 func (s *JWTService) GenerateTokenByUser(user *dto.User, ttl int) (string, error) {
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, DataJwt{
-		Exp:      time.Now().Add(time.Duration(ttl) * time.Minute).Unix(),
-		Iat:      time.Now().Unix(),
-		Username: user.Email,
-		Role:     user.Role,
-		Id:       user.ExternalId,
+		Exp:   time.Now().Add(time.Duration(ttl) * time.Minute).Unix(),
+		Iat:   time.Now().Unix(),
+		Id:    user.Id,
+		Email: user.Email,
 	})
 
 	token, err := jwtToken.SignedString([]byte(s.cfg.JWT.Secret))
@@ -43,6 +42,18 @@ func (s *JWTService) GenerateTokenByUser(user *dto.User, ttl int) (string, error
 		return "", err
 	}
 	return token, nil
+}
+
+func (s *JWTService) CreateTokenByRefreshToken(refreshToken string, ttl int) (string, error) {
+	dataRefreshToken, err := s.ParseToken(refreshToken)
+	if err != nil {
+		return "", err
+	}
+	user := &dto.User{
+		Id:    dataRefreshToken.Id,
+		Email: dataRefreshToken.Email,
+	}
+	return s.GenerateTokenByUser(user, ttl)
 }
 
 func (s *JWTService) ParseToken(tokenString string) (*DataJwt, error) {

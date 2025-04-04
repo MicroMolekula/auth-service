@@ -12,6 +12,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/yandex"
 	"log"
+	"net/http"
 )
 
 func main() {
@@ -38,7 +39,11 @@ func main() {
 	engine := gin.Default()
 	store := cookie.NewStore([]byte(cfg.SessionSecret))
 	store.Options(sessions.Options{
+		Path:     "/",
+		MaxAge:   86400,
 		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+		Secure:   true,
 		Domain:   "",
 	})
 	engine.Use(sessions.Sessions("FITSESSION", store))

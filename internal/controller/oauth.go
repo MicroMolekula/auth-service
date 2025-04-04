@@ -68,13 +68,6 @@ func (oc *OauthYandexController) CallbackHandler(ctx *gin.Context) {
 		ErrorResponse(http.StatusInternalServerError, "Failed to get user info", errors.New("failed to get user info"), ctx)
 		return
 	}
-	session.Options(sessions.Options{
-		Path:     "/",
-		MaxAge:   86400,
-		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
-		Secure:   true,
-	})
 	session.Set("FITSESSION", tokenDto.RefreshToken)
 	if err = session.Save(); err != nil {
 		ErrorResponse(http.StatusInternalServerError, "Failed to save session", errors.New("failed to save session"), ctx)

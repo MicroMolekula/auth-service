@@ -33,17 +33,27 @@ func (oc *OauthYandexController) LoginHandler(ctx *gin.Context) {
 }
 
 func (oc *OauthYandexController) CallbackHandler(ctx *gin.Context) {
-	code := ctx.Query("code")
-	if code == "" {
-		ErrorResponse(http.StatusBadRequest, "Invalid code", errors.New("invalid code"), ctx)
+	//code := ctx.Query("code")
+	//if code == "" {
+	//	ErrorResponse(http.StatusBadRequest, "Invalid code", errors.New("invalid code"), ctx)
+	//	return
+	//}
+	//token, err := oc.oauthConfig.Exchange(context.Background(), code)
+	//if err != nil {
+	//	ErrorResponse(http.StatusInternalServerError, "Failed to exchange token", errors.New("failed to exchange token"), ctx)
+	//	return
+	//}
+	token := ctx.Query("access_token")
+	if token == "" {
+		ErrorResponse(http.StatusBadRequest, "Invalid access token", errors.New("invalid access token"), ctx)
 		return
 	}
-	token, err := oc.oauthConfig.Exchange(context.Background(), code)
+	accessToken, err := oc.oauthConfig.Exchange(context.Background(), token)
 	if err != nil {
 		ErrorResponse(http.StatusInternalServerError, "Failed to exchange token", errors.New("failed to exchange token"), ctx)
 		return
 	}
-	client := oc.oauthConfig.Client(context.Background(), token)
+	client := oc.oauthConfig.Client(context.Background(), accessToken)
 	resp, err := client.Get("https://login.yandex.ru/info?format=json")
 	if err != nil {
 		ErrorResponse(http.StatusInternalServerError, "Failed to get user info", errors.New("failed to get user info"), ctx)

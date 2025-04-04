@@ -15,12 +15,12 @@ jobs:
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@v1
         with:
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USER }}
-        password: ${{ secrets.SSH_PASSWORD }}
-        script: |
-          cd ${{ secrets.PROJECT_DIRECTORY }}
-          git checkout main
-          git pull
-          cd ${{ secrets.DOCKER_DIRECTORY }}
-          make auth-rebuild
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            cd ${{ secrets.PROJECT_DIRECTORY }}
+            git checkout main
+            git pull
+            cd ${{ secrets.DOCKER_DIRECTORY }}
+            make auth-rebuild

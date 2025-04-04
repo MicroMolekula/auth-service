@@ -1,7 +1,7 @@
 volumes:
   postgres: ~
 services:
-  app:
+  auth:
     build:
       dockerfile: Dockerfile
     environment:

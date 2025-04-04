@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"github.com/MicroMolekula/auth-service/internal/dto"
 	"github.com/MicroMolekula/auth-service/internal/service"
 	"github.com/gin-contrib/sessions"
@@ -16,7 +17,7 @@ func NewAuthController(authService *service.AuthService) *AuthController {
 	return &AuthController{authService: authService}
 }
 
-func (ac *AuthController) LoginController(ctx *gin.Context) {
+func (ac *AuthController) Login(ctx *gin.Context) {
 	session := sessions.Default(ctx)
 	var credential dto.UserLogin
 	if err := ctx.ShouldBindBodyWithJSON(&credential); err != nil {
@@ -28,7 +29,7 @@ func (ac *AuthController) LoginController(ctx *gin.Context) {
 		ErrorResponse(http.StatusUnauthorized, "Неверный логин или пароль", err, ctx)
 		return
 	}
-	session.Set("SESSID", token.RefreshToken)
+	session.Set("FITSESSION", token.RefreshToken)
 	if err = session.Save(); err != nil {
 		ErrorResponse(http.StatusInternalServerError, "Ошибка сервера", err, ctx)
 	}
@@ -37,7 +38,7 @@ func (ac *AuthController) LoginController(ctx *gin.Context) {
 	})
 }
 
-func (ac *AuthController) RegisterController(ctx *gin.Context) {
+func (ac *AuthController) Register(ctx *gin.Context) {
 	var credential dto.UserRegister
 	if err := ctx.ShouldBindBodyWithJSON(&credential); err != nil {
 		ErrorResponse(http.StatusBadRequest, "Не правильный формат запроса", err, ctx)
@@ -51,5 +52,34 @@ func (ac *AuthController) RegisterController(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"token":        token.Token,
 		"refreshToken": token.RefreshToken,
+	})
+}
+
+func (ac *AuthController) RefreshToken(ctx *gin.Context) {
+	session := sessions.Default(ctx)
+	refreshToken := session.Get("FITSESSION")
+	if refreshToken == nil {
+		ErrorResponse(http.StatusUnauthorized, "Пользователь не автаризован", errors.New("unauthorized"), ctx)
+		return
+	}
+	token, err := ac.authService.RefreshToken(refreshToken.(string))
+	if err != nil {
+		ErrorResponse(http.StatusInternalServerError, "Ошибка на сервере", err, ctx)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"token": token,
+	})
+}
+
+func (ac *AuthController) Logout(ctx *gin.Context) {
+	session := sessions.Default(ctx)
+	session.Delete("FITSESSION")
+	if err := session.Save(); err != nil {
+		ErrorResponse(http.StatusInternalServerError, "Ошибка на сервере", err, ctx)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
 	})
 }

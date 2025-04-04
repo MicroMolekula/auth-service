@@ -71,3 +71,11 @@ func (s *AuthService) Register(creds dto.UserRegister) (*dto.Token, error) {
 		Password: creds.Password,
 	})
 }
+
+func (s *AuthService) RefreshToken(refreshToken string) (string, error) {
+	token, err := s.jwtService.CreateTokenByRefreshToken(refreshToken, s.cfg.JWT.TTL)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
+}

@@ -14,3 +14,5 @@ jwt:
   secret: 'key'
   ttl: 60 # в минутах
   refresh_ttl: 1440 # в минутах
+  
+session_secret: '123456'

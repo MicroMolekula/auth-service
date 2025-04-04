@@ -26,10 +26,15 @@ func main() {
 	authService := service.NewAuthService(jwtService, userRepository, cfg)
 	authController := controller.NewAuthController(authService)
 	engine := gin.Default()
-	store := cookie.NewStore([]byte("secret"))
-	engine.Use(sessions.Sessions("SESSID", store))
-	engine.POST("/login", authController.LoginController)
-	engine.POST("/register", authController.RegisterController)
+	store := cookie.NewStore([]byte(cfg.SessionSecret))
+	store.Options(sessions.Options{
+		HttpOnly: true,
+	})
+	engine.Use(sessions.Sessions("FITSESSION", store))
+	engine.POST("/login", authController.Login)
+	engine.POST("/register", authController.Register)
+	engine.GET("/refresh_token", authController.RefreshToken)
+	engine.GET("/logout", authController.Logout)
 
 	if err := engine.Run(":" + cfg.Server.Port); err != nil {
 		log.Fatal(err)

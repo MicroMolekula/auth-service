@@ -8,9 +8,10 @@ import (
 )
 
 type Config struct {
-	Server   `yaml:"server"`
-	Database `yaml:"database"`
-	JWT      `yaml:"jwt"`
+	Server        `yaml:"server"`
+	Database      `yaml:"database"`
+	JWT           `yaml:"jwt"`
+	SessionSecret string `yaml:"session_secret"`
 }
 
 type Server struct {

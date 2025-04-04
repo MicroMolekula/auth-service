@@ -39,6 +39,7 @@ func (ac *AuthController) Login(ctx *gin.Context) {
 }
 
 func (ac *AuthController) Register(ctx *gin.Context) {
+	session := sessions.Default(ctx)
 	var credential dto.UserRegister
 	if err := ctx.ShouldBindBodyWithJSON(&credential); err != nil {
 		ErrorResponse(http.StatusBadRequest, "Не правильный формат запроса", err, ctx)
@@ -49,9 +50,9 @@ func (ac *AuthController) Register(ctx *gin.Context) {
 		ErrorResponse(http.StatusConflict, "Такой пользователь уже зарегистрирован", err, ctx)
 		return
 	}
+	session.Set("FITSESSION", token.RefreshToken)
 	ctx.JSON(http.StatusOK, gin.H{
-		"token":        token.Token,
-		"refreshToken": token.RefreshToken,
+		"token": token.Token,
 	})
 }
 

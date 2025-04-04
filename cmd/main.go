@@ -9,6 +9,8 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/yandex"
 	"log"
 )
 
@@ -21,10 +23,18 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	yandexOauthConfig := &oauth2.Config{
+		ClientID:     cfg.OauthYandex.ClientID,
+		ClientSecret: cfg.OauthYandex.ClientSecret,
+		RedirectURL:  cfg.OauthYandex.RedirectURl,
+		Scopes:       []string{"login:birthday", "login:email", "login:info"},
+		Endpoint:     yandex.Endpoint,
+	}
 	userRepository := repository.NewUserRepository(db)
 	jwtService := service.NewJwtService(cfg)
 	authService := service.NewAuthService(jwtService, userRepository, cfg)
 	authController := controller.NewAuthController(authService)
+	oauthYandexController := controller.NewOauthYandexController(cfg, yandexOauthConfig, authService)
 	engine := gin.Default()
 	store := cookie.NewStore([]byte(cfg.SessionSecret))
 	store.Options(sessions.Options{

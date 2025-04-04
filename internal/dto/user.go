@@ -34,3 +34,12 @@ func UserRegisterToModel(user *UserRegister) *models.User {
 		Password: user.Password,
 	}
 }
+
+type YandexUser struct {
+	ID       string `json:"id"`
+	Login    string `json:"login"`
+	Email    string `json:"default_email"`
+	Birthday string `json:"birthday"`
+	Name     string `json:"real_name"`
+	Gender   string `json:"sex"`
+}

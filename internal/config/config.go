@@ -12,6 +12,7 @@ type Config struct {
 	Database      `yaml:"database"`
 	JWT           `yaml:"jwt"`
 	SessionSecret string `yaml:"session_secret"`
+	OauthYandex   `yaml:"oauth_yandex"`
 }
 
 type Server struct {
@@ -26,6 +27,13 @@ type Database struct {
 	Password string `yaml:"password"`
 	DbName   string `yaml:"dbname"`
 	Timezone string `yaml:"timezone"`
+}
+
+type OauthYandex struct {
+	ClientID     string `yaml:"client_id"`
+	ClientSecret string `yaml:"client_secret"`
+	RedirectURl  string `yaml:"redirect_url"`
+	State        string `yaml:"state"`
 }
 
 type JWT struct {

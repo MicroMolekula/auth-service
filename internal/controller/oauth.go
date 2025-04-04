@@ -69,5 +69,6 @@ func (oc *OauthYandexController) CallbackHandler(ctx *gin.Context) {
 		return
 	}
 	session.Set("FITSESSION", tokenDto.RefreshToken)
+	session.Save()
 	ctx.Redirect(http.StatusTemporaryRedirect, "https://not-five.ru")
 }

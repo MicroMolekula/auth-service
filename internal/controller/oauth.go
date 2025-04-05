@@ -34,11 +34,6 @@ func (oc *OauthYandexController) LoginHandler(ctx *gin.Context) {
 
 func (oc *OauthYandexController) CallbackHandler(ctx *gin.Context) {
 	session := sessions.Default(ctx)
-	state := ctx.Query("state")
-	if state != oc.cfg.OauthYandex.State {
-		ErrorResponse(http.StatusBadRequest, "Invalid state", errors.New("invalid state"), ctx)
-		return
-	}
 	code := ctx.Query("code")
 	if code == "" {
 		ErrorResponse(http.StatusBadRequest, "Invalid code", errors.New("invalid code"), ctx)

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/MicroMolekula/auth-service/internal/config"
-	"github.com/MicroMolekula/auth-service/internal/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -13,11 +12,6 @@ func NewDB(cfg *config.Config) (*gorm.DB, error) {
 	dbConn, err := gorm.Open(postgres.Open(makeConfigString(cfg)), &gorm.Config{})
 	if err != nil {
 		return nil, errors.New(fmt.Sprint("database connection error: ", err))
-	}
-
-	err = dbConn.AutoMigrate(models.User{})
-	if err != nil {
-		return nil, errors.New(fmt.Sprint("database migration error: ", err))
 	}
 
 	return dbConn, nil

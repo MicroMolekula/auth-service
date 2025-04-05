@@ -2,6 +2,7 @@ package dto
 
 import (
 	"github.com/MicroMolekula/auth-service/internal/models"
+	"strconv"
 )
 
 type User struct {
@@ -45,9 +46,10 @@ type YandexUser struct {
 }
 
 func YandexUserToModel(user *YandexUser) *models.User {
+	yandexId, _ := strconv.Atoi(user.ID)
 	return &models.User{
 		Name:     user.Name,
 		Email:    user.Email,
-		YandexID: user.ID,
+		YandexID: yandexId,
 	}
 }

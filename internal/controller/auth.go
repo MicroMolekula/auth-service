@@ -51,6 +51,9 @@ func (ac *AuthController) Register(ctx *gin.Context) {
 		return
 	}
 	session.Set("FITSESSION", token.RefreshToken)
+	if err = session.Save(); err != nil {
+		ErrorResponse(http.StatusInternalServerError, "Ошибка сервера", err, ctx)
+	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"token": token.Token,
 	})
